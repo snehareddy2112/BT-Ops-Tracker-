@@ -32,7 +32,7 @@ export function generateDailySummaryText(data: DailyData): string {
     // Sort descending by count
     labEntries.sort((a, b) => b[1] - a[1]);
     lines.push('');
-    lines.push('🧪 Blood Test Labs:');
+    lines.push('🧪 Lab Breakdown:');
     labEntries.forEach(([lab, count]) => {
       lines.push(`${lab}: ${count}`);
     });

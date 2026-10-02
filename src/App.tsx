@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { DailyData, LabName, EscalationRecord, ShiftHistorySummary } from './types';
+import type { DailyData, LabName, EscalationRecord, ThemeMode } from './types';
 import {
   loadTodayData,
   saveDailyData,
-  getHistorySummaries,
+  resetTodayShift,
+  getAllHistoryRecords,
 } from './utils/storage';
-import { calculateDuration, formatTimeOnly } from './utils/date';
+import { getSavedTheme, saveTheme, applyTheme } from './utils/theme';
+import { calculateDuration, formatDisplayDate, formatTimeOnly } from './utils/date';
 import { generateDailySummaryText } from './utils/summary';
 
 import { ShiftHeader } from './components/ShiftHeader';
@@ -16,8 +18,10 @@ import { EscalationModal } from './components/EscalationModal';
 import { EscalationListModal } from './components/EscalationListModal';
 import { DailySummary } from './components/DailySummary';
 import { HistoryModal } from './components/HistoryModal';
+import { ConfirmModal } from './components/ConfirmModal';
 
 export function App() {
+  const [theme, setTheme] = useState<ThemeMode>(() => getSavedTheme());
   const [data, setData] = useState<DailyData>(() => loadTodayData());
 
   // Modals state
@@ -26,15 +30,43 @@ export function App() {
   const [isEscalationModalOpen, setIsEscalationModalOpen] = useState(false);
   const [isEscalationListOpen, setIsEscalationListOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [historyList, setHistoryList] = useState<ShiftHistorySummary[]>([]);
+  const [allHistoryRecords, setAllHistoryRecords] = useState<DailyData[]>([]);
+
+  // Confirmation Modals
+  const [isStartConfirmOpen, setIsStartConfirmOpen] = useState(false);
+  const [isEndConfirmOpen, setIsEndConfirmOpen] = useState(false);
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+
+  // Apply Theme on mount and changes
+  useEffect(() => {
+    applyTheme(theme);
+  }, [theme]);
+
+  // Handle system theme listener
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      if (theme === 'system') {
+        applyTheme('system');
+      }
+    };
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [theme]);
+
+  const handleToggleTheme = () => {
+    const nextTheme: ThemeMode = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    saveTheme(nextTheme);
+  };
 
   // Persist to localStorage whenever state changes
   useEffect(() => {
     saveDailyData(data);
   }, [data]);
 
-  // Shift Actions
-  const handleStartShift = () => {
+  // Start Shift Flow with Confirmation
+  const handleConfirmStartShift = () => {
     const nowIso = new Date().toISOString();
     setData((prev) => ({
       ...prev,
@@ -43,9 +75,11 @@ export function App() {
       logoutTime: null,
       durationFormatted: null,
     }));
+    setIsStartConfirmOpen(false);
   };
 
-  const handleEndShift = () => {
+  // End Shift Flow with Confirmation
+  const handleConfirmEndShift = () => {
     const nowIso = new Date().toISOString();
     const duration = calculateDuration(data.loginTime, nowIso);
     setData((prev) => ({
@@ -54,6 +88,14 @@ export function App() {
       logoutTime: nowIso,
       durationFormatted: duration,
     }));
+    setIsEndConfirmOpen(false);
+  };
+
+  // Reset Shift Flow with Confirmation
+  const handleConfirmResetShift = () => {
+    const resetData = resetTodayShift();
+    setData(resetData);
+    setIsResetConfirmOpen(false);
   };
 
   const handleResumeShift = () => {
@@ -169,8 +211,8 @@ export function App() {
 
   // Open history
   const handleOpenHistory = () => {
-    const summaries = getHistorySummaries();
-    setHistoryList(summaries);
+    const records = getAllHistoryRecords();
+    setAllHistoryRecords(records);
     setIsHistoryOpen(true);
   };
 
@@ -190,7 +232,7 @@ export function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans pb-12 antialiased selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans pb-12 antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-150">
       {/* Sticky Top Header */}
       <ShiftHeader
         date={data.date}
@@ -198,8 +240,11 @@ export function App() {
         loginTime={data.loginTime}
         logoutTime={data.logoutTime}
         durationFormatted={data.durationFormatted}
-        onStartShift={handleStartShift}
-        onEndShift={handleEndShift}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
+        onRequestStartShift={() => setIsStartConfirmOpen(true)}
+        onRequestEndShift={() => setIsEndConfirmOpen(true)}
+        onRequestResetShift={() => setIsResetConfirmOpen(true)}
         onResumeShift={handleResumeShift}
         onOpenHistory={handleOpenHistory}
       />
@@ -285,7 +330,7 @@ export function App() {
                 <button
                   onClick={() => setIsEscalationListOpen(true)}
                   type="button"
-                  className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition touch-press"
+                  className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition active:scale-95"
                 >
                   View
                 </button>
@@ -307,31 +352,94 @@ export function App() {
           />
         </section>
 
-        {/* Daily Summary Component (Always accessible, highlighted on completion) */}
+        {/* Daily Summary Component */}
         <section className="pt-2">
           <DailySummary data={data} />
         </section>
       </main>
 
-      {/* Modals */}
+      {/* Confirmation Modals */}
+      {/* 1. Start Shift Confirmation */}
+      <ConfirmModal
+        isOpen={isStartConfirmOpen}
+        title="Start Shift"
+        confirmLabel="▶ Start Shift"
+        confirmVariant="emerald"
+        description={
+          <div className="space-y-1">
+            <p>Ready to start tracking your shift for today?</p>
+            <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-mono space-y-0.5 mt-2">
+              <div>📅 <strong>{formatDisplayDate(data.date)}</strong></div>
+              <div>🕘 Login Time: <strong>{formatTimeOnly(new Date().toISOString())}</strong></div>
+            </div>
+          </div>
+        }
+        onConfirm={handleConfirmStartShift}
+        onCancel={() => setIsStartConfirmOpen(false)}
+      />
+
+      {/* 2. End Shift Confirmation */}
+      <ConfirmModal
+        isOpen={isEndConfirmOpen}
+        title="End Shift"
+        confirmLabel="🔴 End Shift"
+        confirmVariant="rose"
+        description={
+          <div className="space-y-1">
+            <p>Are you ready to clock out and complete today's shift?</p>
+            <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-mono space-y-0.5 mt-2">
+              <div>🕘 Login: <strong>{formatTimeOnly(data.loginTime)}</strong></div>
+              <div>🕕 Logout: <strong>{formatTimeOnly(new Date().toISOString())}</strong></div>
+              <div>⏱ Duration: <strong>{calculateDuration(data.loginTime, new Date().toISOString())}</strong></div>
+            </div>
+          </div>
+        }
+        onConfirm={handleConfirmEndShift}
+        onCancel={() => setIsEndConfirmOpen(false)}
+      />
+
+      {/* 3. Reset Shift Confirmation */}
+      <ConfirmModal
+        isOpen={isResetConfirmOpen}
+        title="Reset Today's Shift"
+        confirmLabel="Reset Shift"
+        confirmVariant="rose"
+        description={
+          <div className="space-y-2">
+            <p className="text-rose-600 dark:text-rose-400 font-semibold">
+              Warning: This will clear today's active shift and reset all counters to 0.
+            </p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Previous history records will NOT be affected.
+            </p>
+          </div>
+        }
+        onConfirm={handleConfirmResetShift}
+        onCancel={() => setIsResetConfirmOpen(false)}
+      />
+
+      {/* Booking Modal */}
       <BookingModal
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
         onSave={handleSaveBooking}
       />
 
+      {/* Cancellation Modal */}
       <CancellationModal
         isOpen={isCancellationModalOpen}
         onClose={() => setIsCancellationModalOpen(false)}
         onSave={handleSaveCancellation}
       />
 
+      {/* Escalation Modal */}
       <EscalationModal
         isOpen={isEscalationModalOpen}
         onClose={() => setIsEscalationModalOpen(false)}
         onSave={handleSaveEscalation}
       />
 
+      {/* Escalation List Modal */}
       <EscalationListModal
         isOpen={isEscalationListOpen}
         onClose={() => setIsEscalationListOpen(false)}
@@ -339,10 +447,11 @@ export function App() {
         onDeleteEscalation={handleDeleteEscalationRecord}
       />
 
+      {/* History Modal */}
       <HistoryModal
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}
-        historyList={historyList}
+        allRecords={allHistoryRecords}
         onCopyDateSummary={handleCopyDateSummary}
       />
     </div>

@@ -31,7 +31,7 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ data }) => {
           text: summaryText,
         });
       } catch (err) {
-        // Share cancelled or failed, ignore
+        // Share cancelled or ignored
       }
     } else {
       // Fallback to copy
@@ -42,19 +42,19 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ data }) => {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-        <h3 className="text-sm font-bold text-white flex items-center gap-1.5 m-0">
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+        <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5 m-0">
           <span>📌</span>
           <span>Daily Summary Preview</span>
         </h3>
-        <span className="text-[11px] font-semibold text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-900/60">
+        <span className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-200 dark:border-indigo-900/60">
           Ready to Send
         </span>
       </div>
 
       {/* Formatted Text Box */}
-      <pre className="mt-3 p-3.5 bg-slate-950/80 rounded-xl text-xs font-mono text-slate-300 whitespace-pre-wrap border border-slate-800/80 leading-relaxed select-all overflow-x-auto">
+      <pre className="mt-3 p-3.5 bg-slate-50 dark:bg-slate-950/80 rounded-xl text-xs font-mono text-slate-800 dark:text-slate-300 whitespace-pre-wrap border border-slate-200 dark:border-slate-800/80 leading-relaxed select-all overflow-x-auto">
         {summaryText}
       </pre>
 
@@ -63,7 +63,7 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ data }) => {
         <button
           onClick={handleCopy}
           type="button"
-          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-950/50 transition touch-press"
+          className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md active:scale-98 transition"
         >
           {copied ? (
             <>
@@ -81,7 +81,7 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ data }) => {
         <button
           onClick={handleShare}
           type="button"
-          className="flex items-center justify-center gap-1.5 py-3 px-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-semibold text-sm rounded-xl border border-slate-700 transition touch-press"
+          className="flex items-center justify-center gap-1.5 py-3 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-98 text-slate-700 dark:text-slate-200 font-semibold text-sm rounded-xl border border-slate-300 dark:border-slate-700 transition"
           title="Share via WhatsApp, Slack or system share"
         >
           <Share2 className="w-4 h-4" />
@@ -90,7 +90,7 @@ export const DailySummary: React.FC<DailySummaryProps> = ({ data }) => {
       </div>
 
       {shareMsg && (
-        <p className="mt-2 text-center text-xs font-medium text-emerald-400">
+        <p className="mt-2 text-center text-xs font-medium text-emerald-600 dark:text-emerald-400">
           {shareMsg}
         </p>
       )}

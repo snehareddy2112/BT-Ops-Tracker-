@@ -21,10 +21,11 @@ export interface EscalationRecord {
   id: string;
   customerName: string;
   phoneNumber: string;
-  timestamp: string; // ISO string or formatted time e.g. "10:30 AM"
+  timestamp: string; // e.g. "10:30 AM" or ISO
 }
 
 export type ShiftStatus = 'idle' | 'working' | 'completed';
+export type ThemeMode = 'light' | 'dark' | 'system';
 
 export interface DailyData {
   date: string; // YYYY-MM-DD
@@ -51,15 +52,4 @@ export interface DailyData {
   escalationsList: EscalationRecord[];
 }
 
-export interface ShiftHistorySummary {
-  date: string;
-  loginTime: string | null;
-  logoutTime: string | null;
-  durationFormatted: string | null;
-  totalCalls: number;
-  bloodTestsBooked: number;
-  cancellations: number;
-  followups: number;
-  escalations: number;
-  freshdeskTickets: number;
-}
+export interface ShiftHistorySummary extends DailyData {}
