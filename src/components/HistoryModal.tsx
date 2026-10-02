@@ -215,6 +215,10 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({
                       <strong className="text-emerald-600 dark:text-emerald-400">{item.bloodTestsBooked || 0}</strong>
                     </div>
                     <div>
+                      <span className="text-slate-500 dark:text-slate-400">Resched:</span>{' '}
+                      <strong className="text-indigo-600 dark:text-indigo-400">{item.rescheduled || 0}</strong>
+                    </div>
+                    <div>
                       <span className="text-slate-500 dark:text-slate-400">Cancel:</span>{' '}
                       <strong className="text-rose-600 dark:text-rose-400">{item.cancellations || 0}</strong>
                     </div>

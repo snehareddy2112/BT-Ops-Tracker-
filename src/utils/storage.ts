@@ -15,6 +15,7 @@ export function getInitialDailyData(dateStr: string = getTodayDateString()): Dai
     picked: 0,
     dnp: 0,
     bloodTestsBooked: 0,
+    rescheduled: 0,
     cancellations: 0,
     followups: 0,
     escalations: 0,
@@ -34,6 +35,7 @@ export function loadTodayData(): DailyData {
       return {
         ...getInitialDailyData(today),
         ...parsed,
+        rescheduled: parsed.rescheduled || 0,
         date: today,
       };
     }
@@ -87,7 +89,11 @@ export function getAllHistoryRecords(): DailyData[] {
       if (raw) {
         try {
           const item: DailyData = JSON.parse(raw);
-          list.push(item);
+          list.push({
+            ...getInitialDailyData(item.date),
+            ...item,
+            rescheduled: item.rescheduled || 0,
+          });
         } catch {
           // ignore corrupted single record
         }

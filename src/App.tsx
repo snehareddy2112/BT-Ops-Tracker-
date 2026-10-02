@@ -294,7 +294,17 @@ export function App() {
             onDecrement={handleDecrementBooking}
           />
 
-          {/* 5. Cancellations */}
+          {/* 5. Rescheduled */}
+          <ActivityCounter
+            icon="🔄"
+            label="Rescheduled"
+            count={data.rescheduled}
+            colorScheme="indigo"
+            onIncrement={() => updateCounter('rescheduled', 1)}
+            onDecrement={() => updateCounter('rescheduled', -1)}
+          />
+
+          {/* 6. Cancellations */}
           <ActivityCounter
             icon="❌"
             label="Cancellations"
@@ -305,7 +315,7 @@ export function App() {
             onDecrement={handleDecrementCancellation}
           />
 
-          {/* 6. Follow-ups */}
+          {/* 7. Follow-ups */}
           <ActivityCounter
             icon="🔄"
             label="Follow-ups"
@@ -315,7 +325,7 @@ export function App() {
             onDecrement={() => updateCounter('followups', -1)}
           />
 
-          {/* 7. Escalations */}
+          {/* 8. Escalations */}
           <ActivityCounter
             icon="🚨"
             label="Escalations"
@@ -341,7 +351,7 @@ export function App() {
             onDecrement={handleDecrementEscalation}
           />
 
-          {/* 8. Freshdesk Tickets */}
+          {/* 9. Freshdesk Tickets */}
           <ActivityCounter
             icon="🎫"
             label="Freshdesk Tickets"

@@ -39,6 +39,7 @@ export interface DailyData {
   picked: number;
   dnp: number;
   bloodTestsBooked: number;
+  rescheduled: number;
   cancellations: number;
   followups: number;
   escalations: number;

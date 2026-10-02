@@ -17,6 +17,7 @@ export function generateDailySummaryText(data: DailyData): string {
     `✅ Picked: ${data.picked}`,
     `❌ DNP: ${data.dnp}`,
     `🩸 Blood Test Booked: ${data.bloodTestsBooked}`,
+    `🔄 Rescheduled: ${data.rescheduled || 0}`,
     `❌ Cancellations: ${data.cancellations}`,
     `🔄 Follow-up: ${data.followups}`,
     `🚨 Escalations: ${data.escalations}`,
