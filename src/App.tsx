@@ -232,8 +232,8 @@ export function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans pb-12 antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-150">
-      {/* Sticky Top Header */}
+    <div className="min-h-screen lg:h-screen lg:max-h-screen flex flex-col bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-150 lg:overflow-hidden">
+      {/* Sticky Top Header: Start Shift on Left, BT Ops on Right */}
       <ShiftHeader
         date={data.date}
         status={data.shiftStatus}
@@ -249,121 +249,126 @@ export function App() {
         onOpenHistory={handleOpenHistory}
       />
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-xl w-full mx-auto px-3.5 py-4 space-y-4">
-        {/* Compact 2-Column Activity Grid */}
-        <section aria-label="Quick Activity Counters" className="grid grid-cols-2 gap-2.5">
-          {/* 1. Total Calls */}
-          <ActivityCounter
-            icon="📞"
-            label="Total Calls"
-            count={data.totalCalls}
-            colorScheme="indigo"
-            onIncrement={() => updateCounter('totalCalls', 1)}
-            onDecrement={() => updateCounter('totalCalls', -1)}
-          />
+      {/* Main Content Area: Balanced 2-Column Desktop View (No vertical scroll on desktop) */}
+      <main className="flex-1 max-w-7xl w-full mx-auto p-2.5 sm:p-3 lg:p-4 grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4 overflow-y-auto lg:overflow-hidden">
+        {/* LEFT COLUMN: 9 Activity Counters */}
+        <section
+          aria-label="Activity Counters"
+          className="lg:col-span-8 xl:col-span-8 flex flex-col justify-start lg:overflow-y-auto pr-0 lg:pr-1"
+        >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
+            {/* 1. Total Calls */}
+            <ActivityCounter
+              icon="📞"
+              label="Total Calls"
+              count={data.totalCalls}
+              colorScheme="indigo"
+              onIncrement={() => updateCounter('totalCalls', 1)}
+              onDecrement={() => updateCounter('totalCalls', -1)}
+            />
 
-          {/* 2. Picked */}
-          <ActivityCounter
-            icon="✅"
-            label="Picked"
-            count={data.picked}
-            colorScheme="emerald"
-            onIncrement={() => updateCounter('picked', 1)}
-            onDecrement={() => updateCounter('picked', -1)}
-          />
+            {/* 2. Picked */}
+            <ActivityCounter
+              icon="✅"
+              label="Picked"
+              count={data.picked}
+              colorScheme="emerald"
+              onIncrement={() => updateCounter('picked', 1)}
+              onDecrement={() => updateCounter('picked', -1)}
+            />
 
-          {/* 3. DNP */}
-          <ActivityCounter
-            icon="❌"
-            label="DNP"
-            count={data.dnp}
-            colorScheme="rose"
-            onIncrement={() => updateCounter('dnp', 1)}
-            onDecrement={() => updateCounter('dnp', -1)}
-          />
+            {/* 3. DNP */}
+            <ActivityCounter
+              icon="❌"
+              label="DNP"
+              count={data.dnp}
+              colorScheme="rose"
+              onIncrement={() => updateCounter('dnp', 1)}
+              onDecrement={() => updateCounter('dnp', -1)}
+            />
 
-          {/* 4. Blood Tests Booked */}
-          <ActivityCounter
-            icon="🩸"
-            label="Blood Tests Booked"
-            count={data.bloodTestsBooked}
-            subText={formatLabSubtext(data.bloodTestsByLab)}
-            colorScheme="emerald"
-            onIncrement={() => setIsBookingModalOpen(true)}
-            onDecrement={handleDecrementBooking}
-          />
+            {/* 4. Blood Tests Booked */}
+            <ActivityCounter
+              icon="🩸"
+              label="Blood Tests Booked"
+              count={data.bloodTestsBooked}
+              subText={formatLabSubtext(data.bloodTestsByLab)}
+              colorScheme="emerald"
+              onIncrement={() => setIsBookingModalOpen(true)}
+              onDecrement={handleDecrementBooking}
+            />
 
-          {/* 5. Rescheduled */}
-          <ActivityCounter
-            icon="🔄"
-            label="Rescheduled"
-            count={data.rescheduled}
-            colorScheme="indigo"
-            onIncrement={() => updateCounter('rescheduled', 1)}
-            onDecrement={() => updateCounter('rescheduled', -1)}
-          />
+            {/* 5. Rescheduled */}
+            <ActivityCounter
+              icon="🔄"
+              label="Rescheduled"
+              count={data.rescheduled}
+              colorScheme="indigo"
+              onIncrement={() => updateCounter('rescheduled', 1)}
+              onDecrement={() => updateCounter('rescheduled', -1)}
+            />
 
-          {/* 6. Cancellations */}
-          <ActivityCounter
-            icon="❌"
-            label="Cancellations"
-            count={data.cancellations}
-            subText={formatLabSubtext(data.cancellationsByLab)}
-            colorScheme="rose"
-            onIncrement={() => setIsCancellationModalOpen(true)}
-            onDecrement={handleDecrementCancellation}
-          />
+            {/* 6. Cancellations */}
+            <ActivityCounter
+              icon="❌"
+              label="Cancellations"
+              count={data.cancellations}
+              subText={formatLabSubtext(data.cancellationsByLab)}
+              colorScheme="rose"
+              onIncrement={() => setIsCancellationModalOpen(true)}
+              onDecrement={handleDecrementCancellation}
+            />
 
-          {/* 7. Follow-ups */}
-          <ActivityCounter
-            icon="🔄"
-            label="Follow-ups"
-            count={data.followups}
-            colorScheme="indigo"
-            onIncrement={() => updateCounter('followups', 1)}
-            onDecrement={() => updateCounter('followups', -1)}
-          />
+            {/* 7. Follow-ups */}
+            <ActivityCounter
+              icon="🔄"
+              label="Follow-ups"
+              count={data.followups}
+              colorScheme="indigo"
+              onIncrement={() => updateCounter('followups', 1)}
+              onDecrement={() => updateCounter('followups', -1)}
+            />
 
-          {/* 8. Escalations */}
-          <ActivityCounter
-            icon="🚨"
-            label="Escalations"
-            count={data.escalations}
-            subText={
-              data.escalations > 0
-                ? `${data.escalations} customer issue${data.escalations > 1 ? 's' : ''}`
-                : undefined
-            }
-            badge={
-              data.escalations > 0 ? (
-                <button
-                  onClick={() => setIsEscalationListOpen(true)}
-                  type="button"
-                  className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition active:scale-95"
-                >
-                  View
-                </button>
-              ) : null
-            }
-            colorScheme="amber"
-            onIncrement={() => setIsEscalationModalOpen(true)}
-            onDecrement={handleDecrementEscalation}
-          />
+            {/* 8. Escalations */}
+            <ActivityCounter
+              icon="🚨"
+              label="Escalations"
+              count={data.escalations}
+              subText={
+                data.escalations > 0
+                  ? `${data.escalations} customer issue${data.escalations > 1 ? 's' : ''}`
+                  : undefined
+              }
+              badge={
+                data.escalations > 0 ? (
+                  <button
+                    onClick={() => setIsEscalationListOpen(true)}
+                    type="button"
+                    className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition active:scale-95"
+                  >
+                    View
+                  </button>
+                ) : null
+              }
+              colorScheme="amber"
+              onIncrement={() => setIsEscalationModalOpen(true)}
+              onDecrement={handleDecrementEscalation}
+            />
 
-          {/* 9. Freshdesk Tickets */}
-          <ActivityCounter
-            icon="🎫"
-            label="Freshdesk Tickets"
-            count={data.freshdeskTickets}
-            colorScheme="slate"
-            onIncrement={() => updateCounter('freshdeskTickets', 1)}
-            onDecrement={() => updateCounter('freshdeskTickets', -1)}
-          />
+            {/* 9. Freshdesk Tickets */}
+            <ActivityCounter
+              icon="🎫"
+              label="Freshdesk Tickets"
+              count={data.freshdeskTickets}
+              colorScheme="slate"
+              onIncrement={() => updateCounter('freshdeskTickets', 1)}
+              onDecrement={() => updateCounter('freshdeskTickets', -1)}
+            />
+          </div>
         </section>
 
-        {/* Daily Summary Component */}
-        <section className="pt-2">
+        {/* RIGHT COLUMN: Daily Summary Preview */}
+        <section aria-label="Daily Summary Preview" className="lg:col-span-4 xl:col-span-4 flex flex-col h-full lg:overflow-hidden pb-4 lg:pb-0">
           <DailySummary data={data} />
         </section>
       </main>
@@ -391,16 +396,45 @@ export function App() {
       {/* 2. End Shift Confirmation */}
       <ConfirmModal
         isOpen={isEndConfirmOpen}
-        title="End Shift"
-        confirmLabel="🔴 End Shift"
+        title="End today's shift?"
+        confirmLabel="End Shift"
         confirmVariant="rose"
         description={
-          <div className="space-y-1">
-            <p>Are you ready to clock out and complete today's shift?</p>
-            <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-mono space-y-0.5 mt-2">
-              <div>🕘 Login: <strong>{formatTimeOnly(data.loginTime)}</strong></div>
-              <div>🕕 Logout: <strong>{formatTimeOnly(new Date().toISOString())}</strong></div>
-              <div>⏱ Duration: <strong>{calculateDuration(data.loginTime, new Date().toISOString())}</strong></div>
+          <div className="space-y-2">
+            <p className="font-medium text-slate-800 dark:text-slate-200">
+              Are you sure you want to end your shift?
+            </p>
+            <div className="p-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-mono space-y-1 mt-2">
+              <div className="flex justify-between">
+                <span className="text-slate-500 dark:text-slate-400">🕘 Login:</span>
+                <strong className="text-slate-800 dark:text-slate-200">{formatTimeOnly(data.loginTime)}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500 dark:text-slate-400">🕕 Logout:</span>
+                <strong className="text-slate-800 dark:text-slate-200">{formatTimeOnly(new Date().toISOString())}</strong>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500 dark:text-slate-400">⏱ Duration:</span>
+                <strong className="text-emerald-600 dark:text-emerald-400">{calculateDuration(data.loginTime, new Date().toISOString())}</strong>
+              </div>
+            </div>
+
+            {/* Activity Summary Grid */}
+            <div className="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700/60">
+              <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                Activity Summary:
+              </div>
+              <div className="grid grid-cols-3 gap-1 bg-slate-50 dark:bg-slate-950 p-2 rounded-lg border border-slate-200 dark:border-slate-800 text-[11px] font-mono">
+                <div>Calls: <strong>{data.totalCalls}</strong></div>
+                <div>Picked: <strong>{data.picked}</strong></div>
+                <div>DNP: <strong>{data.dnp}</strong></div>
+                <div>Booked: <strong>{data.bloodTestsBooked}</strong></div>
+                <div>Resched: <strong>{data.rescheduled}</strong></div>
+                <div>Cancel: <strong>{data.cancellations}</strong></div>
+                <div>F/U: <strong>{data.followups}</strong></div>
+                <div>Escal: <strong>{data.escalations}</strong></div>
+                <div>Tickets: <strong>{data.freshdeskTickets}</strong></div>
+              </div>
             </div>
           </div>
         }
